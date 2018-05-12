@@ -1,0 +1,2 @@
+run:
+	ruby match.rb
