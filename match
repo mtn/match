@@ -1,0 +1,77 @@
+#!/usr/bin/env ruby
+
+def match_one(pattern, text)
+  # Everything matches the empty pattern
+  if pattern == ""
+    return true
+  end
+
+  # Empty text doesn't match non-empty patterns
+  if text == ""
+    return false
+  end
+
+  # The wildcard pattern matches everything
+  if pattern == "."
+    return true
+  end
+
+  return pattern == text
+end
+
+# Recursively match characters in the string
+def match(pattern, text)
+  # If the pattern is exhausted, the text matched
+  if pattern == ""
+    return true
+  # We can match the end of strings with `$`
+  elsif text == "" && pattern == "$"
+    return true
+  # `?` denotes optional single-character matches
+  elsif pattern[1] == "?"
+    return match_question(pattern, text)
+  # `*` allows zero or more matches of the prior character
+  elsif pattern[1] == "*"
+    return match_star(pattern, text)
+  end
+
+  return match_one(pattern[0], text[0]) &&
+         match(pattern[1..-1], text[1..-1])
+end
+
+# The `^` character restricts matching to the beginning of strings
+def search(pattern, text)
+  if pattern[0] == "^"
+    return match(pattern[1..-1], text)
+  end
+
+  # The `.*` pattern allows the character to appear anywhere in the string
+  # Leading characters that don't match are simply stripped
+  return match(".*#{pattern}", text)
+end
+
+def match_question(pattern, text)
+  # Check if the character before the `?` matches the text, and the
+  # subsequent pattern
+  if match_one(pattern[0], text[0]) and match(pattern[2..-1], text[1..-1])
+    return true
+  end
+
+  # Otherwise, strip the optional and move on
+  return match(pattern[2..-1], text)
+end
+
+def match_star(pattern, text)
+  # If the first character matches, strip it and move on recursively
+  if match_one(pattern[0], text[0]) && match(pattern[2..-1], text[1..-1])
+    return true
+  end
+
+  # Otherwise, advance past the pattern
+  return match(pattern[2..-1], text)
+end
+
+
+puts match_one(".", "a")
+puts match("abc", "ab")
+puts search("abc", "dabce")
