@@ -1,13 +1,15 @@
 #!/usr/bin/env ruby
 
+require 'readline'
+
 def match_one(pattern, text)
   # Everything matches the empty pattern
-  if pattern == ""
+  if not pattern
     return true
   end
 
   # Empty text doesn't match non-empty patterns
-  if text == ""
+  if not text
     return false
   end
 
@@ -63,7 +65,7 @@ end
 
 def match_star(pattern, text)
   # If the first character matches, strip it and move on recursively
-  if match_one(pattern[0], text[0]) && match(pattern[2..-1], text[1..-1])
+  if match_one(pattern[0], text[0]) && match(pattern, text[1..-1])
     return true
   end
 
@@ -71,7 +73,40 @@ def match_star(pattern, text)
   return match(pattern[2..-1], text)
 end
 
+def process_input(line)
+  args = line.split(' ')
+  if args[0].nil?
+    args[0] = ""
+  end
+  if args[1].nil?
+    args[1] = ""
+  end
 
-puts match_one(".", "a")
-puts match("abc", "ab")
-puts search("abc", "dabce")
+  return args[0], args[1]
+end
+
+if ARGV.size > 0
+  contents = File.open(ARGV[0],"r").read.chomp
+  lines = contents.split("\n")
+
+  for line in lines
+    begin
+      pattern, text = process_input(line)
+      p search(pattern, text)
+    rescue => e
+      puts "An error occured #{e.message}"
+      return
+    end
+  end
+
+  return
+end
+
+while buf = Readline.readline('>> ', true)
+  begin
+    pattern, text = process_input(buf)
+    p search(pattern, text)
+  rescue => e
+    puts "An error occured #{e.message}"
+  end
+end

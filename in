@@ -1,0 +1,10 @@
+bc abcd
+ab?c ac
+ab?c abc
+a?b?c? abc
+a?b?c?
+a*
+a* aaaaaaaaa
+a*b aaaaaaaaab
+a*b* aaa
+^abc cabc
